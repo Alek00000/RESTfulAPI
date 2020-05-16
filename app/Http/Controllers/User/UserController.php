@@ -41,33 +41,30 @@ class UserController extends Controller
         $rules = [
             'name' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed'
+            'password' => 'required|min:6|confirmed',
         ];
 
-        $this -> validate($request, $rules);
+        $this->validate($request, $rules);
 
-        $data = $request -> all();
-        $data['password']=bcrypt($request -> password);
-        $data['verified']=User::UNVERIFIED_USER;
-        $data['verification_token']=User::generateVerificationCode();
-        $data['admin']=User::REQULAR_USER;
+        $data = $request->all();
+        $data['password'] = bcrypt($request->password);
+        $data['verified'] = User::UNVERIFIED_USER;
+        $data['verification_token'] = User::generateVerificationCode();
+        $data['admin'] = User::REGULAR_USER;
 
         $user = User::create($data);
 
-        return response() -> json(['data' => $user], 201);
-
+        return $this->showOne($user, 201);
     }
-
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user)
     {
-        $users= User::findOrFail($id);
-        return response()->json(['data' => $users], 200);
+        return $this->showOne($user);
     }
 
     /**

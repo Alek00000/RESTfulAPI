@@ -11,42 +11,6 @@
 |
 */
 
-Route::get('/', function() {
-    return view('welcome');
-});
 
 
-/*
-* Buyer
-*/
-Route::resource('buyers', 'Buyer\BuyerController', ['only' => ['index','show']]);
 
-
-/*
-* Categories
-*/
-Route::resource('categories', 'Category\CategoryController', ['except' => ['index','show']]);
-
-
-/*
-* Products
-*/
-Route::resource('products', 'Product\ProductController', ['only' => ['index','show']]);
-
-
-/*
-* Sellers
-*/
-Route::resource('sellers', 'Seller\SellerController', ['only' => ['index','show']]);
-
-
-/*
-* Transactions
-*/
-Route::resource('transactions', 'Transaction\TransactionController', ['only' => ['index','show']]);
-
-
-/*
-* Users
-*/
-Route::resource('users', 'User\UserController', ['only' => ['index','show']]);
