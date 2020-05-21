@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Buyer;
 
+use App\Buyer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,8 @@ class BuyerController extends Controller
      */
     public function index()
     {
-        //
+        $buyer= Buyer::has('transactions')->get();
+        return response()->json(['data' => $buyer], 200);
     }
 
     /**
@@ -46,7 +48,8 @@ class BuyerController extends Controller
      */
     public function show($id)
     {
-        //
+        $buyer= Buyer::has('transactions')->findOrFail($id);
+        return response()->json(['data' => $buyer], 200);
     }
 
     /**

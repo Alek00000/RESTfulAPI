@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\User;
+
+use App\Mail\UserCreated;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Transformers\UserTransformer;
+use App\Http\Controllers\ApiController;
+use App\User;
 
 class UserController extends Controller
 {
@@ -15,8 +20,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users= User::all();
-        return response() -> json(['data' => $users], 200);
+        $users = User::all();
+
+        return response()->json(['data'=>$users],200);
         //return $users;
     }
 
@@ -54,7 +60,7 @@ class UserController extends Controller
 
         $user = User::create($data);
 
-        return $this->showOne($user, 201);
+        return response()->json(['data'=>$user],201);
     }
     /**
      * Display the specified resource.
@@ -62,9 +68,9 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show($id)
     {
-        return $this->showOne($user);
+        $user = User::findOrFail($id);
     }
 
     /**
@@ -87,7 +93,47 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        $this->validate($request, [
+            'email' => 'email|unique:users,email,' . $user->id,
+            'password' => 'min:6|confirmed',
+            'admin' => 'in:' . User::ADMIN_USER . ',' . User::REGULAR_USER,
+        ]);
+
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+
+        if ($request->has('email') && $user->email != $request->email) {
+            $user->verified = User::UNVERIFIED_USER;
+            $user->verification_token = User::generateVerificationCode();
+            $user->email = $request->email;
+        }
+
+        if ($request->has('password')) {
+            $user->password = bcrypt($request->password);
+        }
+
+        if ($request->has('admin')) {
+
+
+            if (!$user->isVerified()) {
+                return response()->json(['error' =>'Only verified users can modify the admin field', 'code' => 409 ], 409);
+            }
+
+            $user->admin = $request->admin;
+        }
+
+        if (!$user->isDirty()) {
+            return response()->json(['error' =>'You need to specify a different value to update', 'code' => 422 ], 422);
+
+        }
+
+        $user->save();
+
+
+        return response()->json(['data'=>$user],200);
     }
 
     /**
@@ -98,6 +144,8 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->delete();
+        return response()->json(['data'=>$user],200);
     }
 }

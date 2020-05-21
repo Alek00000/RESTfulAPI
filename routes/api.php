@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,7 +23,7 @@ Route::resource('buyers', 'Buyer\BuyerController', ['only' => ['index','show']])
 /*
 * Categories
 */
-Route::resource('categories', 'Category\CategoryController', ['except' => ['index','show']]);
+Route::resource('categories', 'Category\CategoryController', ['except' => ['create','edit']]);
 
 
 /*
@@ -46,4 +47,4 @@ Route::resource('transactions', 'Transaction\TransactionController', ['only' => 
 /*
 * Users
 */
-Route::resource('users', 'User\UserController', ['only' => ['index','show']]);
+Route::resource('users', 'User\UserController', ['except' => ['create','edit']]);
