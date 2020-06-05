@@ -18,6 +18,7 @@ class Product extends Model
 
     public $transformer = ProductTransformer::class;
     protected $dates = ['deleted_at'];
+
     protected $fillable = [
     	'name',
     	'description',
